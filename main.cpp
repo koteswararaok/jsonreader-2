@@ -86,23 +86,17 @@ void getMeProducts(char *fileName, QVector<Products>& productsArray)
 
 int main(int argc, char *argv[])
 {
-    if(argc!=3)
+    if(argc!=4)
     {
         qDebug()<<" Provide First  Arg as listings.txt :  \n";
         qDebug()<<" Provide Second Arg as product.txt :   \n";
+        qDebug()<<" Provide the path of output file:\n";
         qDebug()<<"Insufficient args\n";
         return -1;
     }
 
     QVector<Listings>  listingsArray;
     QVector<Products>  productsArray;
-/*#ifndef WIN32
-    getMeListings("/home/syilmaz/rsadhu/coding/work/qtCoding/jsonReader/listings.txt",listingsArray);
-    getMeProducts("/home/syilmaz/rsadhu/coding/work/qtCoding/jsonReader/products.txt",productsArray);
-#elif WIN32
-    getMeListings("C:\\Users\\KEREM\\Desktop\\work\\qtCoding\\jsonReader\\listings.txt",listingsArray);
-    getMeProducts("C:\\Users\\KEREM\\Desktop\\work\\qtCoding\\jsonReader\\products.txt",productsArray);
-#endif*/
 
     getMeListings(argv[1],listingsArray);
     getMeProducts(argv[2],productsArray);
@@ -115,9 +109,9 @@ int main(int argc, char *argv[])
         for(int j=0;j<listingsArray.size();j++)
         {
             if(
-              productsArray.at(i).manufacturer.compare(listingsArray.at(j).manufacturer,Qt::CaseInsensitive)
-           && listingsArray.at(j).title.contains(productsArray.at(i).family,Qt::CaseInsensitive)
-           && listingsArray.at(j).title.contains(productsArray.at(i).model,Qt::CaseInsensitive))
+                    productsArray.at(i).manufacturer.compare(listingsArray.at(j).manufacturer,Qt::CaseInsensitive)
+                    && listingsArray.at(j).title.contains(productsArray.at(i).family,Qt::CaseInsensitive)
+                    && listingsArray.at(j).title.contains(productsArray.at(i).model,Qt::CaseInsensitive))
             {
                 r.listing.append(listingsArray.at(j));
             }
@@ -125,31 +119,38 @@ int main(int argc, char *argv[])
         results.push_back(r);
     }
 
-    QFile file("/home/syilmaz/rsadhu/jsonreader/output.txt");
+    QFile file(argv[3]);
     if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
+        QByteArray data;
+        data.append("{");
+        for(int i=0;i<results.size();i++)
+        {
+            if(results.at(i).listing.size()>0){
+                data.append("\"product_name\":\"");
+                data.append(results.at(i).productName);
 
-    QByteArray data;
-    for(int i=0;i<results.size();i++)
-    {
-        if(results.at(i).listing.size()>0){
-            data.append(results.at(i).productName);
+                data.append(",\"listings\":");
 
-            for(int j=0;j<results.at(i).listing.size();j++)
-            {
-                data.append(" ");
-                data.append(results.at(i).listing.at(j).title);
-                data.append(" ");
-                data.append(results.at(i).listing.at(j).manufacturer);
-                data.append(" ");
-                data.append(results.at(i).listing.at(j).currency);
-                data.append(" ");
-                data.append(results.at(i).listing.at(j).price);
+                for(int j=0;j<results.at(i).listing.size();j++)
+                {
+                    data.append("\"");
+                    data.append(results.at(i).listing.at(j).title);
+                    data.append(" ");
+                    data.append(results.at(i).listing.at(j).manufacturer);
+                    data.append(" ");
+                    data.append(results.at(i).listing.at(j).currency);
+                    data.append(" ");
+                    data.append(results.at(i).listing.at(j).price);
+                    data.append("\"");
+
+                }
+                data.append(",");
+                data.append("\n");
             }
-            data.append("\n");
         }
-    }
-    file.write(data);
+        data.append("}");
+        file.write(data);
     }
     else
         qDebug()<<" doesnt exist ";
