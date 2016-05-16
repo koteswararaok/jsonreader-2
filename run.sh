@@ -8,5 +8,5 @@ cd jsonreader
 qmake
 make 
 
-./jsonreader 
+./jsonreader  ~/rsadhu/jsonreader/listings.txt ~/rsadhu/jsonreader/products.txt ~/rsadhu/jsonreader/output.txt
 cat output.txt
