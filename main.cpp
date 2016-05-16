@@ -86,15 +86,26 @@ void getMeProducts(char *fileName, QVector<Products>& productsArray)
 
 int main(int argc, char *argv[])
 {
+    if(argc!=3)
+    {
+        qDebug()<<" Provide First  Arg as listings.txt :  \n";
+        qDebug()<<" Provide Second Arg as product.txt :   \n";
+        qDebug()<<"Insufficient args\n";
+        return -1;
+    }
+
     QVector<Listings>  listingsArray;
     QVector<Products>  productsArray;
-#ifndef WIN32
+/*#ifndef WIN32
     getMeListings("/home/syilmaz/rsadhu/coding/work/qtCoding/jsonReader/listings.txt",listingsArray);
     getMeProducts("/home/syilmaz/rsadhu/coding/work/qtCoding/jsonReader/products.txt",productsArray);
 #elif WIN32
     getMeListings("C:\\Users\\KEREM\\Desktop\\work\\qtCoding\\jsonReader\\listings.txt",listingsArray);
     getMeProducts("C:\\Users\\KEREM\\Desktop\\work\\qtCoding\\jsonReader\\products.txt",productsArray);
-#endif
+#endif*/
+
+    getMeListings(argv[1],listingsArray);
+    getMeProducts(argv[2],productsArray);
 
     QVector<Result> results;
     for(int i=0;i<productsArray.size();i++)
@@ -114,31 +125,34 @@ int main(int argc, char *argv[])
         results.push_back(r);
     }
 
-    QFile file("/output.txt");
-    if(file.isOpen())
+    QFile file("/home/syilmaz/rsadhu/jsonreader/output.txt");
+    if(file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
 
     QByteArray data;
     for(int i=0;i<results.size();i++)
     {
+        if(results.at(i).listing.size()>0){
+            data.append(results.at(i).productName);
 
-        data.append(results.at(i).productName);
-
-        for(int j=0;j<results.at(i).listing.size();j++)
-        {
-           data.append(" ");
-           data.append(results.at(i).listing.at(j).title);
-           data.append(" ");
-           data.append(results.at(i).listing.at(j).manufacturer);
-           data.append(" ");
-           data.append(results.at(i).listing.at(j).currency);
-           data.append(" ");
-           data.append(results.at(i).listing.at(j).price);
+            for(int j=0;j<results.at(i).listing.size();j++)
+            {
+                data.append(" ");
+                data.append(results.at(i).listing.at(j).title);
+                data.append(" ");
+                data.append(results.at(i).listing.at(j).manufacturer);
+                data.append(" ");
+                data.append(results.at(i).listing.at(j).currency);
+                data.append(" ");
+                data.append(results.at(i).listing.at(j).price);
+            }
+            data.append("\n");
         }
-        data.append("\n");
     }
     file.write(data);
     }
+    else
+        qDebug()<<" doesnt exist ";
     file.close();
     return 0;
 }
