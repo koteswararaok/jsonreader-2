@@ -1,5 +1,6 @@
 sudo apt-get install qt
-sudo mkdir $(HOME)/rsadhu/
+cd ~
+mkdir rsadhu
 git clone https://github.com/rsadhu/jsonreader.git
 cd jsonreader
 qmake
