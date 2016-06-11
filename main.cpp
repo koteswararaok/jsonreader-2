@@ -43,6 +43,7 @@ void getMeListings(char *fileName,QVector<Listings> &listingsArray)
     {
         QString val;
         val = in.readLine();
+
         QJsonDocument jsonResponse = QJsonDocument::fromJson(val.toUtf8());
 
         QJsonObject jsObj = jsonResponse.object();
@@ -97,7 +98,6 @@ int main(int argc, char *argv[])
 
     QVector<Listings>  listingsArray;
     QVector<Products>  productsArray;
-
     getMeListings(argv[1],listingsArray);
     getMeProducts(argv[2],productsArray);
 
@@ -126,30 +126,45 @@ int main(int argc, char *argv[])
         data.append("{");
         for(int i=0;i<results.size();i++)
         {
-            if(results.at(i).listing.size()>0){
-                data.append("\"product_name\":\"");
+            if(results.at(i).listing.size()>0)
+            {
+                data.append("{\"product_name\":\"");
                 data.append(results.at(i).productName);
 
-                data.append(",\"listings\":");
+                data.append("\",\"listings\":[");
 
                 for(int j=0;j<results.at(i).listing.size();j++)
                 {
-                    data.append("\"");
-                    data.append(results.at(i).listing.at(j).title);
-                    data.append(" ");
-                    data.append(results.at(i).listing.at(j).manufacturer);
-                    data.append(" ");
-                    data.append(results.at(i).listing.at(j).currency);
-                    data.append(" ");
-                    data.append(results.at(i).listing.at(j).price);
-                    data.append("\"");
+                    data.append("{\"title\":\"");
+                    QString title = results.at(i).listing.at(j).title;
+//                    title = title.replace("\""," ");
+                    data.append(title);
 
+                    data.append("\",\"manufacturer\":\"");
+                    data.append(results.at(i).listing.at(j).manufacturer);
+                    data.append("\",\"currency\":\"");
+                    data.append(results.at(i).listing.at(j).currency);
+                    data.append("\",\"price\":\"");
+                    data.append(results.at(i).listing.at(j).price);
+                    data.append("\"},");
+
+                    /*data.append("[\"");
+                      data.append(results.at(i).listing.at(j).title);
+                      data.append("\",\"");
+                      data.append(results.at(i).listing.at(j).manufacturer);
+                      data.append("\",\"");
+                      data.append(results.at(i).listing.at(j).currency);
+                      data.append("\",\"");
+                      data.append(results.at(i).listing.at(j).price);
+                      data.append("\"],");*/
                 }
-                data.append(",");
+
+                data = data.remove(data.length()-1,1);
+
+                data.append("]}");
                 data.append("\n");
             }
         }
-        data.append("}");
         file.write(data);
     }
     else
